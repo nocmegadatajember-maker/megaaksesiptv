@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mega Akses IPTV</title>
+    <!-- Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- HLS.js Library -->
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <!-- Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <style>
+        :root {
+            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f2027 100%);
+            --glass-bg: rgba(30, 41, 59, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+            --primary: #38bdf8; /* Warna biru langit modern */
+            --primary-dim: rgba(56, 189, 248, 0.2);
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+            --danger: #ef4444;
+            --success: #22c55e;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            scrollbar-width: thin;
+            scrollbar-color: var(--primary) rgba(0,0,0,0.2);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-gradient);
+            background-attachment: fixed;
+            color: var(--text-main);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden; /* Mencegah scroll pada body utama */
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); }
+        ::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 3px; }
+
+        /* HEADER */
+        header {
+            padding: 12px 20px;
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--glass-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 50;
+            flex-shrink: 0;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            text-shadow: 0 0 10px var(--primary-dim);
+        }
+
+        .header-actions button {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            color: var(--text-main);
+            padding: 8px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .header-actions button:hover {
+            background: var(--primary);
+            color: #0f172a;
+            border-color: var(--primary);
+        }
+
+        /* MAIN LAYOUT */
+        main {
+            display: flex;
+            flex: 1; /* Mengisi ruang tersisa antara header dan footer */
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* PLAYER SECTION */
+        .player-section {
+            flex: 2;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            position: relative;
+            overflow-y: auto;
+        }
+
+        .video-container {
+            width: 100%;
+            max-width: 1000px;
+            aspect-ratio: 16/9;
+            background: #000;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 0 40px rgba(0,0,0,0.5);
+            border: 1px solid var(--glass-border);
+            position: relative;
+            z-index: 10;
+        }
+
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            background: #000;
+        }
+
+        .info-panel {
+            margin-top: 15px;
+            text-align: center;
+            background: var(--glass-bg);
+            padding: 10px 25px;
+            border-radius: 50px;
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(8px);
+            min-width: 300px;
+        }
+
+        .info-panel h2 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .info-panel span {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            display: block;
+            margin-top: 4px;
+        }
+
+        /* SIDEBAR (CHANNEL LIST) */
+        .sidebar {
+            flex: 1;
+            max-width: 400px;
+            min-width: 300px;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(20px);
+            border-left: 1px solid var(--glass-border);
+            display: flex;
+            flex-direction: column;
+            padding: 0; /* Padding dihandle oleh children */
+        }
+
+        .search-area {
+            padding: 15px;
+            border-bottom: 1px solid var(--glass-border);
+            position: sticky;
+            top: 0;
+            background: rgba(15, 23, 42, 0.9);
+            z-index: 20;
+        }
+
+        .search-input-wrap {
+            position: relative;
+        }
+
+        .search-input-wrap i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+        }
+
+        .search-input-wrap input {
+            width: 100%;
+            padding: 10px 10px 10px 38px;
+            border-radius: 8px;
+            border: 1px solid var(--glass-border);
+            background: rgba(0, 0, 0, 0.3);
+            color: white;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        .search-input-wrap input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px var(--primary-dim);
+        }
+
+        .list-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+        }
+
+        .channel-card {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: 4px;
+            border: 1px solid transparent;
+        }
+
+        .channel-card:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .channel-card.active {
+            background: rgba(56, 189, 248, 0.15);
+            border-color: var(--primary);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .ch-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.05);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            flex-shrink: 0;
+            border: 1px solid var(--glass-border);
+        }
+        
+        .ch-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .ch-info {
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .ch-name {
+            font-size: 0.9rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-weight: 500;
+        }
+
+        .ch-cat {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+        }
+
+        /* FOOTER */
+        footer {
+            padding: 10px;
+            text-align: center;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            background: rgba(15, 23, 42, 0.9);
+            border-top: 1px solid var(--glass-border);
+            letter-spacing: 0.5px;
+            flex-shrink: 0; /* Memastikan footer tidak mengecil */
+            z-index: 50;
+        }
+
+        /* UTILITY: Loader & Toast */
+        .overlay-msg {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.75);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 30;
+            backdrop-filter: blur(4px);
+            border-radius: 12px;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(255,255,255,0.2);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 10px;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .toast {
+            position: fixed;
+            bottom: 60px; /* Di atas footer */
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background: rgba(15, 23, 42, 0.95);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9rem;
+        }
+
+        .toast.visible {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* MODAL */
+        .modal {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 200;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-box {
+            background: #1e293b;
+            padding: 25px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--glass-shadow);
+        }
+
+        .modal-box h3 { margin-bottom: 15px; color: var(--primary); }
+        .modal-box p { margin-bottom: 10px; font-size: 0.85rem; color: #ccc; }
+        
+        .modal-box textarea {
+            width: 100%;
+            height: 150px;
+            background: #0f172a;
+            border: 1px solid #334155;
+            color: white;
+            padding: 10px;
+            border-radius: 6px;
+            resize: none;
+            font-family: monospace;
+            font-size: 0.8rem;
+        }
+
+        .modal-btns {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+        .btn-prim { background: var(--primary); color: #0f172a; }
+        .btn-sec { background: transparent; color: white; border: 1px solid var(--glass-border); }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            main { flex-direction: column; overflow-y: auto; }
+            .player-section { flex: none; padding: 10px; min-height: 35vh; }
+            .sidebar { flex: 1; max-width: 100%; border-left: none; border-top: 1px solid var(--glass-border); min-height: 40vh; }
+            .video-container { border-radius: 8px; }
+            .brand span { display: none; } /* Hide text on very small screens, keep icon */
+            .brand::after { content: 'IPTV'; display: block; color: var(--primary); }
+            footer { position: sticky; bottom: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- HEADER -->
+    <header>
+        <div class="brand">
+            <i class="ph-fill ph-broadcast" style="font-size: 24px;"></i>
+            <span>Mega Akses IPTV</span>
+        </div>
+        <div class="header-actions">
+            <button onclick="openInputModal()">
+                <i class="ph ph-file-text"></i> Input M3U
+            </button>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <main>
+        <!-- VIDEO PLAYER -->
+        <section class="player-section">
+            <div class="video-container">
+                <video id="videoPlayer" controls autoplay></video>
+                
+                <!-- Overlay Loading / Error -->
+                <div id="playerOverlay" class="overlay-msg" style="display: none;">
+                    <div class="spinner" id="overlaySpinner"></div>
+                    <span id="overlayText">Memuat...</span>
+                </div>
+            </div>
+
+            <div class="info-panel">
+                <h2 id="chTitle">Silakan Pilih Channel</h2>
+                <span id="chStatus">Menunggu...</span>
+            </div>
+        </section>
+
+        <!-- CHANNEL LIST SIDEBAR -->
+        <aside class="sidebar">
+            <div class="search-area">
+                <div class="search-input-wrap">
+                    <i class="ph ph-magnifying-glass"></i>
+                    <input type="text" id="searchBox" placeholder="Cari channel (cth: RCTI)...">
+                </div>
+            </div>
+            <div id="listContainer" class="list-container">
+                <!-- Channel Items Generated by JS -->
+                <div style="text-align:center; padding:20px; color: var(--text-muted);">
+                    <i class="ph ph-spinner ph-spin" style="font-size:24px"></i>
+                    <br>Memuat Database...
+                </div>
+            </div>
+        </aside>
+    </main>
+
+    <!-- FOOTER -->
+    <footer>
+        by: noc megadata jember 2026 right all reserved
+    </footer>
+
+    <!-- TOAST NOTIFICATION -->
+    <div id="toast" class="toast">
+        <i id="toastIcon" class="ph ph-info"></i>
+        <span id="toastMsg">Info</span>
+    </div>
+
+    <!-- MANUAL INPUT MODAL -->
+    <div id="inputModal" class="modal">
+        <div class="modal-box">
+            <h3>Input Playlist Manual</h3>
+            <p>Jika gagal memuat otomatis (CORS), salin isi file .m3u dan tempel di bawah ini.</p>
+            <textarea id="manualTextarea" placeholder="#EXTM3U..."></textarea>
+            <div class="modal-btns">
+                <button class="btn btn-sec" onclick="closeInputModal()">Batal</button>
+                <button class="btn btn-prim" onclick="processManualInput()">Muat Data</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- KONFIGURASI ---
+        const M3U_SOURCE = 'https://mgi24.github.io/tvdigital/idwork.m3u';
+        
+        // --- STATE VARIABLES ---
+        let allChannels = [];
+        let currentPlayingUrl = null;
+        let hlsInstance = null;
+        const video = document.getElementById('videoPlayer');
+        const listContainer = document.getElementById('listContainer');
+        const searchBox = document.getElementById('searchBox');
+        const overlay = document.getElementById('playerOverlay');
+
+        // --- EVENT LISTENERS ---
+        searchBox.addEventListener('input', (e) => filterChannels(e.target.value));
+
+        // --- INIT ---
+        window.addEventListener('DOMContentLoaded', () => {
+            fetchPlaylist(M3U_SOURCE);
+        });
+
+        // --- LOGIC UTAMA ---
+
+        // 1. Ambil Data M3U
+        async function fetchPlaylist(url) {
+            showOverlay(true, 'Mengunduh daftar channel...');
+            try {
+                const res = await fetch(url);
+                if(!res.ok) throw new Error("Network error");
+                const text = await res.text();
+                parseM3U(text);
+                showToast('Playlist berhasil dimuat', 'success');
+            } catch (err) {
+                console.error(err);
+                showOverlay(false);
+                showToast('Gagal memuat otomatis! Gunakan Input Manual.', 'error');
+                // Otomatis buka modal untuk bantuan
+                setTimeout(openInputModal, 1000);
+            }
+        }
+
+        // 2. Parse M3U ke Array JSON
+        function parseM3U(data) {
+            const lines = data.split('\n');
+            allChannels = [];
+            let tempCh = {};
+
+            lines.forEach(line => {
+                line = line.trim();
+                if(!line) return;
+
+                if(line.startsWith('#EXTINF:')) {
+                    // Ambil Nama Channel (setelah koma terakhir)
+                    const infoParts = line.split(',');
+                    const name = infoParts.length > 1 ? infoParts[infoParts.length - 1].trim() : "Unknown";
+                    
+                    // Ambil Logo
+                    const logoMatch = line.match(/tvg-logo="([^"]*)"/);
+                    const logo = logoMatch ? logoMatch[1] : null;
+
+                    // Ambil Grup
+                    const groupMatch = line.match(/group-title="([^"]*)"/);
+                    const group = groupMatch ? groupMatch[1] : "Umum";
+
+                    tempCh = { name, logo, group, url: '' };
+                } else if (!line.startsWith('#')) {
+                    // Ini URL Stream
+                    if (tempCh.name) {
+                        tempCh.url = line;
+                        allChannels.push(tempCh);
+                        tempCh = {};
+                    }
+                }
+            });
+
+            if (allChannels.length > 0) {
+                renderList(allChannels);
+                // Auto play pertama
+                playChannel(0);
+            } else {
+                listContainer.innerHTML = '<div style="padding:20px;text-align:center;">Tidak ada data valid ditemukan.</div>';
+                showOverlay(false);
+            }
+        }
+
+        // 3. Render Daftar Channel ke HTML
+        function renderList(data) {
+            listContainer.innerHTML = '';
+            
+            if(data.length === 0) {
+                listContainer.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text-muted)">Channel tidak ditemukan.</div>';
+                return;
+            }
+
+            data.forEach(ch => {
+                // Cek apakah channel ini sedang aktif dimainkan
+                const isActive = (ch.url === currentPlayingUrl);
+                
+                const div = document.createElement('div');
+                div.className = `channel-card ${isActive ? 'active' : ''}`;
+                div.onclick = () => playChannelByUrl(ch.url);
+
+                // Fallback Ikon
+                let iconHtml = '<i class="ph ph-television" style="font-size:20px"></i>';
+                if (ch.logo) {
+                    iconHtml = `<img src="${ch.logo}" onerror="this.onerror=null;this.parentElement.innerHTML='<i class=\\'ph ph-television\\' style=\\'font-size:20px\\'></i>'">`;
+                }
+
+                div.innerHTML = `
+                    <div class="ch-icon">${iconHtml}</div>
+                    <div class="ch-info">
+                        <div class="ch-name">${ch.name}</div>
+                        <div class="ch-cat">${ch.group}</div>
+                    </div>
+                `;
+                listContainer.appendChild(div);
+            });
+        }
+
+        // 4. Putar Channel berdasarkan URL (Lebih aman untuk state pencarian)
+        function playChannelByUrl(url) {
+            const index = allChannels.findIndex(c => c.url === url);
+            if (index === -1) return;
+            
+            const channel = allChannels[index];
+            currentPlayingUrl = url;
+
+            // Update UI Info
+            document.getElementById('chTitle').textContent = channel.name;
+            document.getElementById('chStatus').textContent = "Buffering...";
+            showOverlay(true, 'Menyiapkan Stream...');
+
+            // Update Highlight List (Re-render list simple or DOM manipulation)
+            // Kita re-render list tergantung filter aktif atau tidak
+            const query = searchBox.value.toLowerCase();
+            const filtered = allChannels.filter(c => c.name.toLowerCase().includes(query));
+            renderList(filtered); // Render ulang agar class 'active' terupdate
+
+            // Logika Player HLS
+            if (Hls.isSupported() && url.includes('.m3u8')) {
+                if (hlsInstance) hlsInstance.destroy();
+                
+                hlsInstance = new Hls();
+                hlsInstance.loadSource(url);
+                hlsInstance.attachMedia(video);
+                
+                hlsInstance.on(Hls.Events.MANIFEST_PARSED, () => {
+                    video.play().catch(e => console.log("Autoplay blocked", e));
+                    showOverlay(false);
+                    document.getElementById('chStatus').textContent = "Sedang Memutar";
+                });
+
+                hlsInstance.on(Hls.Events.ERROR, (event, data) => {
+                    if (data.fatal) {
+                        showOverlay(false);
+                        document.getElementById('chStatus').textContent = "Stream Offline / Error";
+                        showToast('Gagal memutar channel ini', 'error');
+                    }
+                });
+            } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                // Safari Native
+                video.src = url;
+                video.addEventListener('loadedmetadata', () => {
+                    video.play();
+                    showOverlay(false);
+                });
+            } else {
+                // Direct File (MP4)
+                video.src = url;
+                video.play();
+                showOverlay(false);
+            }
+        }
+
+        // Helper wrapper untuk index array
+        function playChannel(index) {
+            if(allChannels[index]) {
+                playChannelByUrl(allChannels[index].url);
+            }
+        }
+
+        // 5. Filter / Pencarian
+        function filterChannels(query) {
+            const lowerQ = query.toLowerCase();
+            const filtered = allChannels.filter(ch => ch.name.toLowerCase().includes(lowerQ));
+            renderList(filtered);
+        }
+
+        // --- UI UTILITIES ---
+        function showOverlay(show, text = '') {
+            overlay.style.display = show ? 'flex' : 'none';
+            if(text) document.getElementById('overlayText').textContent = text;
+            const spinner = document.getElementById('overlaySpinner');
+            spinner.style.display = show ? 'block' : 'none';
+        }
+
+        function showToast(msg, type = 'info') {
+            const t = document.getElementById('toast');
+            const tm = document.getElementById('toastMsg');
+            const ti = document.getElementById('toastIcon');
+
+            tm.textContent = msg;
+            if (type === 'success') {
+                ti.style.color = 'var(--success)';
+                ti.className = 'ph ph-check-circle';
+            } else if (type === 'error') {
+                ti.style.color = 'var(--danger)';
+                ti.className = 'ph ph-warning-circle';
+            } else {
+                ti.style.color = 'var(--primary)';
+                ti.className = 'ph ph-info';
+            }
+
+            t.classList.add('visible');
+            setTimeout(() => t.classList.remove('visible'), 3000);
+        }
+
+        // --- MODAL FUNCTIONS ---
+        function openInputModal() {
+            document.getElementById('inputModal').style.display = 'flex';
+        }
+        function closeInputModal() {
+            document.getElementById('inputModal').style.display = 'none';
+        }
+        function processManualInput() {
+            const txt = document.getElementById('manualTextarea').value;
+            if(!txt.trim()) return showToast('Input kosong!', 'error');
+            parseM3U(txt);
+            closeInputModal();
+        }
+        
+        // Close modal on outside click
+        window.onclick = function(e) {
+            const m = document.getElementById('inputModal');
+            if (e.target == m) closeInputModal();
+        }
+    </script>
+</body>
+</html>
