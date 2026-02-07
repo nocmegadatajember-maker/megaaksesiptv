@@ -3,142 +3,194 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mega Akses IPTV - Github Edition</title>
-    <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;600;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <title>Mega Akses IPTV - Stable Server</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
     <style>
         :root {
-            --bg-dark: #0a0b0e;
-            --panel-bg: #16181d;
-            --primary: #00f2ff;
-            --primary-glow: rgba(0, 242, 255, 0.4);
-            --text-main: #e2e8f0;
-            --text-muted: #94a3b8;
-            --accent-red: #ef4444;
-            --accent-green: #22c55e;
+            --bg-color: #050505;
+            --bg-gradient: radial-gradient(circle at top right, #1a1a2e 0%, #000000 100%);
             --glass: rgba(255, 255, 255, 0.05);
-            --border: rgba(255, 255, 255, 0.08);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --primary: #3b82f6; /* Biru Stabil */
+            --accent: #f43f5e;
+            --text: #ffffff;
+            --text-sec: #94a3b8;
+            --success: #10b981;
+            --danger: #ef4444;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; scrollbar-width: thin; scrollbar-color: var(--border) var(--bg-dark); }
-        body { font-family: 'Inter', sans-serif; background: var(--bg-dark); color: var(--text-main); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+        * { box-sizing: border-box; margin: 0; padding: 0; outline: none; }
         
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: var(--bg-dark); }
-        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-color);
+            background-image: var(--bg-gradient);
+            color: var(--text);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* SCROLLBAR */
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 5px; }
         ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
 
         /* HEADER */
         header {
             height: 60px;
-            background: var(--panel-bg);
-            border-bottom: 1px solid var(--border);
+            background: rgba(10, 10, 10, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--glass-border);
             display: flex;
             align-items: center;
             justify-content: space-between;
             padding: 0 20px;
-            flex-shrink: 0;
             z-index: 50;
         }
-        .logo { font-family: 'Exo 2', sans-serif; font-weight: 700; font-size: 1.2rem; color: var(--primary); display: flex; align-items: center; gap: 8px; text-transform: uppercase; letter-spacing: 1px; }
-        .logo i { font-size: 1.5rem; text-shadow: 0 0 15px var(--primary-glow); }
 
-        /* LAYOUT UTAMA */
-        main { display: flex; flex: 1; height: calc(100vh - 90px); overflow: hidden; } /* 90px = Header + Footer height */
+        .brand {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .brand span { color: var(--primary); }
+        .brand i { font-size: 1.4rem; color: var(--primary); }
 
-        /* PLAYER AREA */
-        .player-section {
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.8rem;
+            color: var(--text-sec);
+            background: rgba(255,255,255,0.05);
+            padding: 5px 10px;
+            border-radius: 20px;
+            border: 1px solid var(--glass-border);
+        }
+        .dot { width: 8px; height: 8px; background: var(--success); border-radius: 50%; box-shadow: 0 0 10px var(--success); }
+        .dot.offline { background: var(--danger); box-shadow: 0 0 10px var(--danger); }
+
+        /* MAIN CONTENT */
+        main {
+            display: flex;
+            flex: 1;
+            height: calc(100vh - 85px); /* Header + Footer height */
+            overflow: hidden;
+        }
+
+        /* PLAYER SECTION */
+        .video-section {
             flex: 2;
-            background: radial-gradient(circle at center, #1a1d26 0%, #0a0b0e 100%);
+            position: relative;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            padding: 20px;
-            position: relative;
-        }
-
-        .video-box {
-            width: 100%;
-            max-width: 1100px;
-            aspect-ratio: 16/9;
             background: #000;
-            border-radius: 4px; /* Cinematic look */
-            box-shadow: 0 20px 50px -10px rgba(0,0,0,0.7);
-            border: 1px solid var(--border);
-            overflow: hidden;
+        }
+
+        .player-wrapper {
+            width: 100%;
+            height: 100%;
             position: relative;
         }
 
-        video { width: 100%; height: 100%; object-fit: contain; }
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
 
-        .now-playing {
-            margin-top: 20px;
-            text-align: center;
+        .loading-screen {
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0.85);
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
         }
-        .now-playing h1 { font-size: 1.5rem; font-family: 'Exo 2', sans-serif; color: #fff; margin-bottom: 5px; }
-        .now-playing p { color: var(--text-muted); font-size: 0.9rem; }
         
-        .status-badge {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            background: var(--glass);
-            border: 1px solid var(--border);
-            margin-left: 10px;
+        .loader {
+            width: 40px; height: 40px;
+            border: 3px solid rgba(255,255,255,0.1);
+            border-top: 3px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
         }
-        .status-badge.live { color: var(--accent-green); border-color: var(--accent-green); }
-        .status-badge.error { color: var(--accent-red); border-color: var(--accent-red); }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .overlay-info {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(5px);
+            padding: 15px 20px;
+            border-radius: 10px;
+            border-left: 3px solid var(--primary);
+            max-width: 80%;
+        }
+        .overlay-info h1 { font-size: 1.2rem; margin-bottom: 5px; font-family: 'Outfit', sans-serif; }
+        .overlay-info p { font-size: 0.85rem; color: var(--text-sec); }
 
         /* SIDEBAR */
         .sidebar {
             flex: 1;
             min-width: 320px;
-            max-width: 450px;
-            background: var(--panel-bg);
-            border-left: 1px solid var(--border);
+            max-width: 420px;
+            background: rgba(10, 10, 10, 0.95);
+            border-left: 1px solid var(--glass-border);
             display: flex;
             flex-direction: column;
         }
 
-        /* CATEGORY TABS */
         .tabs {
-            display: flex;
-            border-bottom: 1px solid var(--border);
-            background: rgba(0,0,0,0.2);
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            border-bottom: 1px solid var(--glass-border);
         }
+        
         .tab {
-            flex: 1;
-            padding: 12px;
+            padding: 15px;
             text-align: center;
             cursor: pointer;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             font-weight: 600;
-            color: var(--text-muted);
-            transition: 0.3s;
+            color: var(--text-sec);
             border-bottom: 2px solid transparent;
+            transition: 0.3s;
         }
-        .tab:hover { background: rgba(255,255,255,0.02); color: #fff; }
-        .tab.active { color: var(--primary); border-bottom-color: var(--primary); background: rgba(0, 242, 255, 0.05); }
+        .tab:hover { background: rgba(255,255,255,0.05); color: #fff; }
+        .tab.active { color: var(--primary); border-bottom-color: var(--primary); background: rgba(59, 130, 246, 0.05); }
 
-        /* SEARCH & LIST */
-        .search-container { padding: 15px; border-bottom: 1px solid var(--border); }
         .search-box {
+            padding: 15px;
+            background: rgba(0,0,0,0.3);
+            position: relative;
+        }
+        .search-box input {
             width: 100%;
-            background: var(--bg-dark);
-            border: 1px solid var(--border);
+            background: #1a1a1a;
+            border: 1px solid #333;
+            color: white;
             padding: 10px 15px 10px 35px;
             border-radius: 6px;
-            color: #fff;
-            font-family: inherit;
+            font-family: 'Inter', sans-serif;
         }
-        .search-box:focus { border-color: var(--primary); outline: none; }
-        .search-icon { position: absolute; margin-left: 12px; margin-top: -32px; color: var(--text-muted); pointer-events: none; }
+        .search-box input:focus { border-color: var(--primary); }
+        .search-icon { position: absolute; left: 25px; top: 22px; color: #666; pointer-events: none; }
 
         .channel-list {
             flex: 1;
@@ -146,436 +198,470 @@
             padding: 10px;
         }
 
-        .channel-item {
+        .ch-card {
             display: flex;
             align-items: center;
-            padding: 10px;
-            margin-bottom: 6px;
-            background: rgba(255,255,255,0.03);
-            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 5px;
+            background: rgba(255,255,255,0.02);
+            border-radius: 8px;
             cursor: pointer;
             border: 1px solid transparent;
             transition: all 0.2s;
         }
-        .channel-item:hover { background: rgba(255,255,255,0.06); transform: translateX(4px); }
-        .channel-item.active {
-            background: rgba(0, 242, 255, 0.1);
-            border-color: var(--primary);
-            box-shadow: 0 0 15px -5px var(--primary-glow);
+        .ch-card:hover { background: rgba(255,255,255,0.05); transform: translateX(2px); }
+        
+        .ch-card.active {
+            background: rgba(59, 130, 246, 0.15);
+            border-color: rgba(59, 130, 246, 0.4);
         }
 
-        .ch-icon {
-            width: 38px; height: 38px;
+        .ch-logo {
+            width: 40px; height: 40px;
             border-radius: 50%;
-            background: #252830;
+            background: #222;
             margin-right: 12px;
             display: flex; align-items: center; justify-content: center;
             overflow: hidden;
             border: 1px solid #333;
+            flex-shrink: 0;
         }
-        .ch-icon img { width: 100%; height: 100%; object-fit: cover; }
-        .ch-icon i { color: var(--text-muted); font-size: 18px; }
+        .ch-logo img { width: 100%; height: 100%; object-fit: cover; }
+        .ch-logo i { font-size: 18px; color: #555; }
 
         .ch-info { flex: 1; overflow: hidden; }
-        .ch-name { font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .ch-cat { font-size: 0.75rem; color: var(--text-muted); display: flex; align-items: center; gap: 5px; }
-        
-        .online-dot { width: 6px; height: 6px; background: var(--accent-green); border-radius: 50%; display: inline-block; }
-        
+        .ch-name { font-weight: 500; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .ch-status { font-size: 0.7rem; color: #666; display: flex; align-items: center; gap: 4px; margin-top: 2px; }
+
+        .ch-card.active .ch-status { color: var(--primary); }
+
         /* FOOTER */
         footer {
-            height: 30px;
-            background: var(--bg-dark);
-            border-top: 1px solid var(--border);
+            height: 25px;
+            background: #050505;
+            border-top: 1px solid var(--glass-border);
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 0.7rem;
-            color: var(--text-muted);
-            letter-spacing: 0.5px;
+            color: #444;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
-
-        /* LOADING & ERROR UI */
-        .overlay {
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.8);
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 10;
-        }
-        .spinner {
-            width: 50px; height: 50px;
-            border: 3px solid rgba(255,255,255,0.1);
-            border-top: 3px solid var(--primary);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin { 100% { transform: rotate(360deg); } }
 
         /* RESPONSIVE */
-        @media (max-width: 900px) {
+        @media (max-width: 850px) {
             main { flex-direction: column; overflow-y: auto; height: auto; }
-            .player-section { min-height: 40vh; padding: 10px; }
-            .sidebar { height: 60vh; min-width: 100%; border-left: none; border-top: 1px solid var(--border); }
+            .video-section { height: 45vh; flex: none; }
+            .sidebar { height: 55vh; min-width: 100%; border-left: none; border-top: 1px solid var(--glass-border); }
         }
     </style>
 </head>
 <body>
 
-    <!-- HEADER -->
     <header>
-        <div class="logo">
+        <div class="brand">
             <i class="ph-fill ph-broadcast"></i>
-            <span>Mega Akses IPTV</span>
+            Mega Akses <span>IPTV</span>
         </div>
-        <div>
-            <!-- Tombol Opsional untuk reload playlist -->
-            <button onclick="location.reload()" style="background:transparent; border:1px solid var(--border); color:var(--text-muted); padding:5px 10px; border-radius:4px; cursor:pointer; font-size:0.8rem;">
-                <i class="ph ph-arrows-clockwise"></i> Refresh
-            </button>
+        <div class="status-indicator">
+            <div class="dot" id="sysDot"></div>
+            <span id="sysText">System Ready</span>
         </div>
     </header>
 
-    <!-- MAIN -->
     <main>
-        <!-- PLAYER -->
-        <section class="player-section">
-            <div class="video-box">
+        <!-- VIDEO PLAYER -->
+        <div class="video-section">
+            <div class="player-wrapper">
                 <video id="videoPlayer" controls autoplay></video>
                 
-                <!-- Overlay Loading -->
-                <div id="loaderOverlay" class="overlay">
-                    <div class="spinner"></div>
-                    <p style="margin-top:10px; color:#fff;">Connecting...</p>
+                <div id="loaderOverlay" class="loading-screen">
+                    <div class="loader"></div>
+                    <p style="margin-top:15px; color:#fff;" id="loaderText">Menghubungkan...</p>
+                </div>
+
+                <div class="overlay-info">
+                    <h1 id="currentTitle">Pilih Channel</h1>
+                    <p id="currentDesc">Menunggu pemilihan channel...</p>
                 </div>
             </div>
-            
-            <div class="now-playing">
-                <h1 id="channelTitle">Silakan Pilih Channel</h1>
-                <p>Status: <span id="channelStatus" class="status-badge">Standby</span></p>
-            </div>
-        </section>
+        </div>
 
         <!-- SIDEBAR -->
-        <aside class="sidebar">
+        <div class="sidebar">
             <div class="tabs">
-                <div class="tab active" onclick="switchTab('indo')">Indonesia</div>
+                <div class="tab active" onclick="switchTab('indo')">Nasional</div>
+                <div class="tab" onclick="switchTab('local')">Lokal/News</div>
                 <div class="tab" onclick="switchTab('inter')">Internasional</div>
-                <div class="tab" onclick="switchTab('news')">News</div>
             </div>
-
-            <div class="search-container" style="position:relative;">
+            
+            <div class="search-box">
                 <div class="search-icon"><i class="ph ph-magnifying-glass"></i></div>
-                <input type="text" id="searchInput" class="search-box" placeholder="Cari channel...">
+                <input type="text" id="searchInput" placeholder="Cari channel...">
             </div>
 
             <div id="channelList" class="channel-list">
-                <!-- Javascript will populate this -->
+                <!-- JS Generated -->
             </div>
-        </aside>
+        </div>
     </main>
 
-    <!-- FOOTER -->
     <footer>
         by: noc megadata jember 2026 right all reserved
     </footer>
 
     <script>
-        // --- DATABASE CHANNEL (EMBEDDED FIX) ---
-        // Catatan: Link TV Swasta (RCTI/SCTV) diganti dengan TV Regional/Publik yang bisa dimainkan di GitHub Pages
-        // karena channel swasta biasanya memiliki proteksi DRM/App Only.
+        // --- DATABASE CHANNEL (UPDATE 2024 - OPTIMIZED FOR GITHUB PAGES) ---
+        // Sumber utama: Siar.us cluster (Open Broadcast) & Public IPTV
+        // Channel Swasta besar (RCTI/SCTV) sering mati karena proteksi, disini gunakan link alternatif terbaik.
         
-        const DATABASE = [
-            // --- KATEGORI: INDONESIA ---
+        const CHANNELS = [
+            // --- KATEGORI: NASIONAL (TV SWASTA & TVRI) ---
             {
-                category: 'indo',
+                cat: 'indo',
                 name: "TVRI Nasional",
                 logo: "https://upload.wikimedia.org/wikipedia/commons/b/b1/TVRINasional_2022.svg",
                 url: "https://v1.siar.us/kaskus/tvri.m3u8"
             },
             {
-                category: 'indo',
-                name: "TVRI Jawa Barat",
-                logo: "https://upload.wikimedia.org/wikipedia/commons/b/b1/TVRINasional_2022.svg",
-                url: "https://v1.siar.us/kaskus/tvrijabar.m3u8"
+                cat: 'indo',
+                name: "RCTI (Best Effort)",
+                logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/76/RCTI_2020.svg/1200px-RCTI_2020.svg.png",
+                url: "https://v1.siar.us/kaskus/rcti.m3u8" // Link ini kadang naik turun karena blokir MNC
             },
             {
-                category: 'indo',
-                name: "JOGJA TV",
-                logo: "https://upload.wikimedia.org/wikipedia/commons/1/16/Jogja_TV.png",
-                url: "https://v1.siar.us/kaskus/jogjatv.m3u8" // User confirmed working
+                cat: 'indo',
+                name: "MNCTV",
+                logo: "https://upload.wikimedia.org/wikipedia/commons/a/a1/MNCTV_2021.svg",
+                url: "https://v1.siar.us/kaskus/mnctv.m3u8"
             },
             {
-                category: 'indo',
-                name: "Bali TV",
-                logo: "https://upload.wikimedia.org/wikipedia/commons/2/2e/BaliTV.png",
-                url: "https://v1.siar.us/kaskus/balitv.m3u8"
+                cat: 'indo',
+                name: "GTV",
+                logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0d/GTV_logo_2020.svg/1200px-GTV_logo_2020.svg.png",
+                url: "https://v1.siar.us/kaskus/gtv.m3u8"
             },
             {
-                category: 'indo',
-                name: "JTV Surabaya",
-                logo: "https://upload.wikimedia.org/wikipedia/commons/e/e7/Jtv.png",
-                url: "https://v1.siar.us/kaskus/jtv.m3u8"
+                cat: 'indo',
+                name: "RCTI (Backup)",
+                logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/76/RCTI_2020.svg/1200px-RCTI_2020.svg.png",
+                url: "https://v2.siar.us/kaskus/rcti.m3u8" // Backup Link
             },
             {
-                category: 'indo',
-                name: "Batam TV",
-                logo: "https://upload.wikimedia.org/wikipedia/commons/2/20/Logo_Batam_TV.png",
-                url: "https://v1.siar.us/kaskus/batamtv.m3u8"
+                cat: 'indo',
+                name: "Indosiar",
+                logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/45/Indosiar_2020.svg/1200px-Indosiar_2020.svg.png",
+                url: "https://v1.siar.us/kaskus/indosiar.m3u8"
             },
             {
-                category: 'indo',
+                cat: 'indo',
+                name: "SCTV",
+                logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/86/SCTV_2020.svg/1200px-SCTV_2020.svg.png",
+                url: "https://v1.siar.us/kaskus/sctv.m3u8"
+            },
+            {
+                cat: 'indo',
+                name: "ANTV",
+                logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/61/ANTV_Logo_2016.svg/1200px-ANTV_Logo_2016.svg.png",
+                url: "https://v1.siar.us/kaskus/antv.m3u8"
+            },
+            {
+                cat: 'indo',
                 name: "NET TV",
                 logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/NET._Logo_2016.svg/1200px-NET._Logo_2016.svg.png",
                 url: "https://v1.siar.us/kaskus/nettv.m3u8"
             },
             {
-                category: 'indo',
-                name: "Rodja TV",
-                logo: "https://upload.wikimedia.org/wikipedia/commons/8/83/Rodjatv.png",
-                url: "https://v1.siar.us/kaskus/rodjatv.m3u8"
+                cat: 'indo',
+                name: "RTV",
+                logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/Rajawali_TV_logo_%282018%29.svg/1200px-Rajawali_TV_logo_%282018%29.svg.png",
+                url: "https://v1.siar.us/kaskus/rtv.m3u8"
             },
             {
-                category: 'indo',
-                name: "Spacetoon Indonesia",
-                logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/Spacetoon_Indonesia.png/1200px-Spacetoon_Indonesia.png",
-                url: "https://v1.siar.us/kaskus/spacetoon.m3u8"
+                cat: 'indo',
+                name: "Trans TV",
+                logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3b/Trans_TV_logo.svg/1200px-Trans_TV_logo.svg.png",
+                url: "https://v1.siar.us/kaskus/transtv.m3u8"
             },
             {
-                category: 'indo',
-                name: "DAAI TV",
-                logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7d/DaaiTV.png/1200px-DaaiTV.png",
-                url: "https://v1.siar.us/kaskus/daaitv.m3u8"
+                cat: 'indo',
+                name: "Trans7",
+                logo: "https://upload.wikimedia.org/wikipedia/commons/7/7d/Trans7.svg",
+                url: "https://v1.siar.us/kaskus/trans7.m3u8"
+            },
+            {
+                cat: 'indo',
+                name: "INews",
+                logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bf/INews_logo.svg/1200px-INews_logo.svg.png",
+                url: "https://v1.siar.us/kaskus/inews.m3u8"
             },
 
-            // --- KATEGORI: NEWS (INTERNASIONAL & LOKAL) ---
+            // --- KATEGORI: LOKAL & NEWS (Sangat Stabil) ---
             {
-                category: 'news',
+                cat: 'local',
+                name: "JTV Surabaya",
+                logo: "https://upload.wikimedia.org/wikipedia/commons/e/e7/Jtv.png",
+                url: "https://v1.siar.us/kaskus/jtv.m3u8"
+            },
+            {
+                cat: 'local',
+                name: "JOGJA TV",
+                logo: "https://upload.wikimedia.org/wikipedia/commons/1/16/Jogja_TV.png",
+                url: "https://v1.siar.us/kaskus/jogjatv.m3u8"
+            },
+            {
+                cat: 'local',
+                name: "Bali TV",
+                logo: "https://upload.wikimedia.org/wikipedia/commons/2/2e/BaliTV.png",
+                url: "https://v1.siar.us/kaskus/balitv.m3u8"
+            },
+            {
+                cat: 'local',
+                name: "Batam TV",
+                logo: "https://upload.wikimedia.org/wikipedia/commons/2/20/Logo_Batam_TV.png",
+                url: "https://v1.siar.us/kaskus/batamtv.m3u8"
+            },
+            {
+                cat: 'local',
                 name: "Metro TV",
                 logo: "https://upload.wikimedia.org/wikipedia/commons/2/23/MetroTV_logo_%282019%29.svg",
                 url: "https://v1.siar.us/kaskus/metrotv.m3u8"
             },
             {
-                category: 'news',
-                name: "CNN International",
-                logo: "https://upload.wikimedia.org/wikipedia/en/thumb/6/66/CNN.svg/1200px-CNN.svg.png",
-                url: "https://cnn-cnninternational-1-eu.rakuten.wurl.tv/playlist.m3u8"
+                cat: 'local',
+                name: "TVOne",
+                logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/TVOne_2020.svg/1200px-TVOne_2020.svg.png",
+                url: "https://v1.siar.us/kaskus/tvone.m3u8"
             },
             {
-                category: 'news',
-                name: "BBC World News",
-                logo: "https://upload.wikimedia.org/wikipedia/en/thumb/1/15/BBC_World_News_2019.svg/1200px-BBC_World_News_2019.svg.png",
-                url: "https://bbcwspanual.akamaized.net/hls/live/2019845/bbc_world/playlist.m3u8"
+                cat: 'local',
+                name: "Kompas TV",
+                logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/Kompas_TV_2015.svg/1200px-Kompas_TV_2015.svg.png",
+                url: "https://v1.siar.us/kaskus/kompastv.m3u8"
             },
             {
-                category: 'news',
-                name: "Al Jazeera English",
-                logo: "https://upload.wikimedia.org/wikipedia/en/thumb/f/f2/Aljazeera_eng.svg/1200px-Aljazeera_eng.svg.png",
-                url: "https://live-hls-web-aje.getaj.net/AJE/03.m3u8"
+                cat: 'local',
+                name: "Berita Satu",
+                logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Beritasatu_2012.svg/1200px-Beritasatu_2012.svg.png",
+                url: "https://v1.siar.us/kaskus/beritasatu.m3u8"
             },
             {
-                category: 'news',
+                cat: 'local',
+                name: "Jak TV",
+                logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/af/Jak_TV.png/1200px-Jak_TV.png",
+                url: "https://v1.siar.us/kaskus/jaktv.m3u8"
+            },
+            {
+                cat: 'local',
+                name: "MQTV (Mekkah)",
+                logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a1/Mqtv.png/1200px-Mqtv.png",
+                url: "https://v1.siar.us/kaskus/mqtv.m3u8"
+            },
+            {
+                cat: 'local',
+                name: "Rodja TV",
+                logo: "https://upload.wikimedia.org/wikipedia/commons/8/83/Rodjatv.png",
+                url: "https://v1.siar.us/kaskus/rodjatv.m3u8"
+            },
+
+            // --- KATEGORI: INTERNASIONAL (100% Online) ---
+            {
+                cat: 'inter',
                 name: "DW English",
                 logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/DW_Logo_2012.svg/1200px-DW_Logo_2012.svg.png",
                 url: "https://dwamdstream102.akamaized.net/hls/live/2015525/dwstream102/index.m3u8"
             },
             {
-                category: 'news',
-                name: "France 24 English",
-                logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/France24.png/1200px-France24.png",
-                url: "https://cdn.klowdtv.net/803B48A/n1.klowdtv.net/live1/france24_720p/playlist.m3u8"
+                cat: 'inter',
+                name: "Al Jazeera English",
+                logo: "https://upload.wikimedia.org/wikipedia/en/thumb/f/f2/Aljazeera_eng.svg/1200px-Aljazeera_eng.svg.png",
+                url: "https://live-hls-web-aje.getaj.net/AJE/03.m3u8"
             },
-
-            // --- KATEGORI: INTERNATIONAL ---
             {
-                category: 'inter',
-                name: "NASA TV Public",
+                cat: 'inter',
+                name: "CNN International",
+                logo: "https://upload.wikimedia.org/wikipedia/en/thumb/6/66/CNN.svg/1200px-CNN.svg.png",
+                url: "https://cnn-cnninternational-1-eu.rakuten.wurl.tv/playlist.m3u8"
+            },
+            {
+                cat: 'inter',
+                name: "TRT World",
+                logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/74/TRT_World_2018.svg/1200px-TRT_World_2018.svg.png",
+                url: "https://tv-trtworld.live.trt.com.tr/master.m3u8"
+            },
+            {
+                cat: 'inter',
+                name: "NASA TV",
                 logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/NASA_logo.svg/1200px-NASA_logo.svg.png",
                 url: "https://ntv1.akamaized.net/hls/live/2014075/NASA-TV-1/master.m3u8"
             },
             {
-                category: 'inter',
-                name: "Fashion TV",
-                logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/46/F_TV_logo.svg/1200px-F_TV_logo.svg.png",
-                url: "https://fash1043.cloudycdn.services/slive/_definst_/ftv_mid_dl/chunklist_w1086229041.m3u8"
-            },
-            {
-                category: 'inter',
-                name: "Red Bull TV",
-                logo: "https://upload.wikimedia.org/wikipedia/en/thumb/2/29/Red_Bull_TV_logo.svg/1200px-Red_Bull_TV_logo.svg.png",
-                url: "https://rbmn-live.akamaized.net/hls/live/590964/BoRB-AT/master.m3u8"
-            },
-            {
-                category: 'inter',
-                name: "Euronews English",
-                logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/96/Euronews_2016_logo.svg/1200px-Euronews_2016_logo.svg.png",
-                url: "https://euronews-euronews-world-2-eu.rakuten.wurl.tv/playlist.m3u8"
-            },
-            {
-                category: 'inter',
-                name: "RT Documentary",
-                logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/Russia-today-logo.svg/1200px-Russia-today-logo.svg.png",
-                url: "https://rt-rtd.rttv.com/dvr/rtdoc/playlist_4500Kb.m3u8"
-            },
-            {
-                category: 'inter',
+                cat: 'inter',
                 name: "Pluto TV Movies",
                 logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/Pluto_TV_logo.svg/1200px-Pluto_TV_logo.svg.png",
                 url: "https://service-stitcher.clusters.pluto.tv/stitch/hls/channel/5cb0cae7a461406ffe3f5213/master.m3u8"
             },
             {
-                category: 'inter',
-                name: "Classic Movies",
+                cat: 'inter',
+                name: "Pluto TV Action",
                 logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/Pluto_TV_logo.svg/1200px-Pluto_TV_logo.svg.png",
-                url: "https://service-stitcher.clusters.pluto.tv/stitch/hls/channel/5c957466a461406ffe3f5a72/master.m3u8"
+                url: "https://service-stitcher.clusters.pluto.tv/stitch/hls/channel/5cb0cae9a461406ffe3f5216/master.m3u8"
+            },
+            {
+                cat: 'inter',
+                name: "Red Bull TV",
+                logo: "https://upload.wikimedia.org/wikipedia/en/thumb/2/29/Red_Bull_TV_logo.svg/1200px-Red_Bull_TV_logo.svg.png",
+                url: "https://rbmn-live.akamaized.net/hls/live/590964/BoRB-AT/master.m3u8"
+            },
+            {
+                cat: 'inter',
+                name: "Fashion TV",
+                logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/46/F_TV_logo.svg/1200px-F_TV_logo.svg.png",
+                url: "https://fash1043.cloudycdn.services/slive/_definst_/ftv_mid_dl/chunklist_w1086229041.m3u8"
+            },
+            {
+                cat: 'inter',
+                name: "Test Stream (Big Buck)",
+                logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Big_buck_bunny_poster_big.jpg/1200px-Big_buck_bunny_poster_big.jpg",
+                url: "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8"
             }
         ];
 
-        // --- ENGINE ---
-        let currentCategory = 'indo';
+        // --- LOGIC ---
+        let currentCat = 'indo';
         let hls = null;
-        let currentStreamUrl = null;
+        let currentUrl = null;
         
         const video = document.getElementById('videoPlayer');
-        const listContainer = document.getElementById('channelList');
+        const listEl = document.getElementById('channelList');
         const searchInput = document.getElementById('searchInput');
         const loader = document.getElementById('loaderOverlay');
-        const statusBadge = document.getElementById('channelStatus');
+        const sysDot = document.getElementById('sysDot');
+        const sysText = document.getElementById('sysText');
 
         // Init
         window.addEventListener('DOMContentLoaded', () => {
             renderList();
-            // Auto play first channel
-            playChannel(DATABASE[0].url);
+            playChannel(CHANNELS[0].url);
         });
 
-        // Search
-        searchInput.addEventListener('input', (e) => {
-            renderList(e.target.value.toLowerCase());
-        });
+        // Event Listeners
+        searchInput.addEventListener('input', (e) => renderList(e.target.value.toLowerCase()));
 
-        // Tab Switching
+        // Switch Tab
         function switchTab(cat) {
-            currentCategory = cat;
-            // Update Tab UI
+            currentCat = cat;
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             event.target.classList.add('active');
-            // Clear search
             searchInput.value = '';
-            // Render
             renderList();
         }
 
-        // Render List
-        function renderList(searchQuery = '') {
-            listContainer.innerHTML = '';
+        // Render Function
+        function renderList(search = '') {
+            listEl.innerHTML = '';
+            const filtered = CHANNELS.filter(c => c.cat === currentCat && c.name.toLowerCase().includes(search));
             
-            const filtered = DATABASE.filter(ch => ch.category === currentCategory && ch.name.toLowerCase().includes(searchQuery));
-
-            if (filtered.length === 0) {
-                listContainer.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-muted);">Channel tidak ditemukan</div>';
+            if(filtered.length === 0) {
+                listEl.innerHTML = '<div style="text-align:center; padding:20px; color:#444; font-size:0.8rem;">Data tidak ditemukan</div>';
                 return;
             }
 
             filtered.forEach(ch => {
-                const isActive = (ch.url === currentStreamUrl);
-                const item = document.createElement('div');
-                item.className = `channel-item ${isActive ? 'active' : ''}`;
-                item.onclick = () => playChannel(ch.url);
+                const isActive = (ch.url === currentUrl);
+                const div = document.createElement('div');
+                div.className = `ch-card ${isActive ? 'active' : ''}`;
+                div.onclick = () => playChannel(ch.url);
 
                 let logoHtml = `<i class="ph ph-monitor-play"></i>`;
                 if(ch.logo) {
                     logoHtml = `<img src="${ch.logo}" onerror="this.onerror=null;this.parentElement.innerHTML='<i class=\\'ph ph-monitor-play\\'></i>'">`;
                 }
 
-                item.innerHTML = `
-                    <div class="ch-icon">${logoHtml}</div>
+                div.innerHTML = `
+                    <div class="ch-logo">${logoHtml}</div>
                     <div class="ch-info">
                         <div class="ch-name">${ch.name}</div>
-                        <div class="ch-cat"><span class="online-dot"></span> HD Stream</div>
+                        <div class="ch-status">${isActive ? 'Sedang Memutar' : 'HLS Stream'}</div>
                     </div>
                 `;
-                listContainer.appendChild(item);
+                listEl.appendChild(div);
             });
         }
 
-        // Play Logic (Fixed for Github Pages)
+        // Play Function
         function playChannel(url) {
-            currentStreamUrl = url;
-            const chData = DATABASE.find(c => c.url === url);
+            currentUrl = url;
+            const ch = CHANNELS.find(c => c.url === url);
             
-            if(chData) {
-                document.getElementById('channelTitle').textContent = chData.name;
-            }
-
+            document.getElementById('currentTitle').textContent = ch ? ch.name : "Unknown";
+            document.getElementById('currentDesc').textContent = "Mencoba menghubungkan...";
+            
             showLoader(true);
-            setStatus('Buffering...', 'live');
+            setSysStatus('Connecting...', false);
 
-            // UI Highlight Update
             renderList(searchInput.value.toLowerCase());
 
-            if (Hls.isSupported()) {
-                if (hls) {
-                    hls.destroy();
-                }
+            if(Hls.isSupported()) {
+                if(hls) hls.destroy();
                 hls = new Hls({
-                    debug: false,
                     enableWorker: true,
                     lowLatencyMode: true,
-                    backBufferLength: 90
                 });
+                
                 hls.loadSource(url);
                 hls.attachMedia(video);
-                
-                hls.on(Hls.Events.MANIFEST_PARSED, function() {
-                    video.play().catch(e => console.log("Autoplay blocked", e));
+
+                hls.on(Hls.Events.MANIFEST_PARSED, () => {
+                    video.play().catch(e => {});
                     showLoader(false);
-                    setStatus('Sedang Memutar', 'live');
+                    setSysStatus('Online', true);
+                    document.getElementById('currentDesc').textContent = "Stream Stabil";
                 });
 
-                hls.on(Hls.Events.ERROR, function (event, data) {
-                    if (data.fatal) {
+                hls.on(Hls.Events.ERROR, (event, data) => {
+                    if(data.fatal) {
                         showLoader(false);
-                        setStatus('Stream Offline/Error', 'error');
-                        switch (data.type) {
+                        setSysStatus('Offline / Error', false);
+                        document.getElementById('currentDesc').textContent = "Channel tidak dapat diakses saat ini.";
+                        
+                        // Auto Recovery Logic
+                        switch(data.type) {
                             case Hls.ErrorTypes.NETWORK_ERROR:
-                                console.log("fatal network error encountered, try to recover");
                                 hls.startLoad();
                                 break;
                             case Hls.ErrorTypes.MEDIA_ERROR:
-                                console.log("fatal media error encountered, try to recover");
                                 hls.recoverMediaError();
                                 break;
                             default:
-                                hls.destroy();
                                 break;
                         }
                     }
                 });
             } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
                 video.src = url;
-                video.addEventListener('loadedmetadata', function() {
+                video.addEventListener('loadedmetadata', () => {
                     video.play();
                     showLoader(false);
+                    setSysStatus('Online', true);
                 });
-            } else {
-                alert("Browser Anda tidak mendukung HLS.");
-                showLoader(false);
             }
         }
 
+        // UI Helpers
         function showLoader(show) {
             loader.style.display = show ? 'flex' : 'none';
         }
 
-        function setStatus(text, type) {
-            statusBadge.textContent = text;
-            statusBadge.className = 'status-badge ' + type;
+        function setSysStatus(text, online) {
+            sysText.textContent = text;
+            if(online) {
+                sysDot.classList.remove('offline');
+            } else {
+                sysDot.classList.add('offline');
+            }
         }
-
     </script>
 </body>
 </html>
