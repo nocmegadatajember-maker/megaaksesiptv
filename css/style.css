@@ -1,0 +1,31 @@
+.header {
+  background: linear-gradient(to right, #667eea, #764ba2);
+  padding: 20px;
+  text-align: center;
+  color: white;
+}
+
+.player {
+  width: 100%;
+  height: auto;
+  margin: 20px 0;
+}
+
+.channel-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 10px;
+}
+
+.channel {
+  background: #fff;
+  border-radius: 5px;
+  padding: 10px;
+  text-align: center;
+}
+
+@media (max-width: 600px) {
+  .header {
+    font-size: 1.5em;
+  }
+}
