@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mega Akses IPTV - Stable List</title>
+    <title>Mega Akses IPTV - Grab idwork.m3u</title>
     <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
@@ -11,16 +11,17 @@
     <style>
         :root {
             /* TEMA NAVY BLUE */
-            --bg-body: #050b14;
+            --bg-body: #020617;
             --bg-panel: #0f172a;
+            --bg-input: #1e293b;
             --primary: #3b82f6;
-            --primary-glow: rgba(59, 130, 246, 0.3);
-            --text: #e2e8f0;
-            --text-dim: #64748b;
-            --border: #1e293b;
-            --card-bg: rgba(30, 41, 59, 0.4);
+            --primary-hover: #2563eb;
+            --text: #f8fafc;
+            --text-sec: #94a3b8;
+            --border: #334155;
             --success: #10b981;
-            --error: #ef4444;
+            --danger: #ef4444;
+            --warning: #f59e0b;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; outline: none; }
@@ -43,7 +44,7 @@
 
         /* HEADER */
         header {
-            height: 55px;
+            height: 60px;
             background: var(--bg-panel);
             border-bottom: 1px solid var(--border);
             display: flex;
@@ -56,18 +57,17 @@
         .logo {
             font-family: 'Rajdhani', sans-serif;
             font-weight: 700;
-            font-size: 1.3rem;
+            font-size: 1.2rem;
             color: #fff;
-            display: flex; align-items: center; gap: 8px;
+            display: flex; align-items: center; gap: 10px;
         }
         .logo span { color: var(--primary); }
-        .badge {
+        .source-badge {
+            font-size: 0.7rem;
             background: rgba(59, 130, 246, 0.2);
             color: var(--primary);
-            padding: 4px 10px;
+            padding: 4px 8px;
             border-radius: 4px;
-            font-size: 0.75rem;
-            font-weight: 600;
             border: 1px solid var(--primary);
         }
 
@@ -75,11 +75,11 @@
         .container {
             display: flex;
             flex: 1;
-            height: calc(100vh - 85px);
+            height: calc(100vh - 90px);
             overflow: hidden;
         }
 
-        /* PLAYER SECTION */
+        /* PLAYER */
         .player-wrap {
             flex: 2;
             background: #000;
@@ -89,30 +89,23 @@
             align-items: center;
             position: relative;
         }
-
-        .video-frame {
-            width: 100%;
-            height: 100%;
-            position: relative;
-        }
-
         video { width: 100%; height: 100%; object-fit: contain; }
 
         .player-info {
             position: absolute;
             bottom: 20px;
             left: 20px;
-            background: rgba(15, 23, 42, 0.9);
-            padding: 12px 24px;
-            border-radius: 4px;
+            background: rgba(15, 23, 42, 0.95);
+            padding: 15px 25px;
+            border-radius: 6px;
             border-left: 4px solid var(--primary);
-            backdrop-filter: blur(8px);
+            backdrop-filter: blur(5px);
         }
-        .player-info h2 { font-family: 'Rajdhani', sans-serif; font-size: 1.5rem; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
-        .player-info p { font-size: 0.85rem; margin-top: 4px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+        .player-info h2 { font-family: 'Rajdhani', sans-serif; font-size: 1.4rem; text-transform: uppercase; color: #fff; }
+        .player-info p { font-size: 0.85rem; color: var(--text-sec); margin-top: 5px; display: flex; align-items: center; gap: 8px; }
         .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
         .dot-online { background: var(--success); box-shadow: 0 0 10px var(--success); }
-        .dot-offline { background: var(--error); box-shadow: 0 0 10px var(--error); }
+        .dot-offline { background: var(--danger); box-shadow: 0 0 10px var(--danger); }
 
         /* SIDEBAR */
         .sidebar {
@@ -125,36 +118,27 @@
             flex-direction: column;
         }
 
-        .tabs {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            background: #0b1120;
-        }
-        .tab-btn {
+        .sidebar-header {
             padding: 15px;
-            background: transparent;
-            color: var(--text-dim);
-            border: none;
-            border-bottom: 3px solid transparent;
-            cursor: pointer;
-            font-family: 'Rajdhani', sans-serif;
-            font-weight: 700;
-            transition: 0.3s;
-            font-size: 0.9rem;
-        }
-        .tab-btn:hover { color: #fff; background: #1e293b; }
-        .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); background: rgba(59, 130, 246, 0.1); }
-
-        .search-area { padding: 15px; background: var(--bg-panel); border-bottom: 1px solid var(--border); }
-        .search-input {
-            width: 100%;
-            padding: 12px;
+            border-bottom: 1px solid var(--border);
             background: #0b1120;
+        }
+        .search-box {
+            width: 100%;
+            background: var(--bg-input);
             border: 1px solid var(--border);
             color: #fff;
+            padding: 10px;
             border-radius: 4px;
+            display: flex;
+            align-items: center;
         }
-        .search-input:focus { border-color: var(--primary); }
+        .search-box:focus-within { border-color: var(--primary); }
+        .search-box i { color: var(--text-sec); margin-right: 10px; }
+        .search-box input {
+            background: transparent; border: none; color: #fff; width: 100%;
+            font-family: inherit;
+        }
 
         .list-area { flex: 1; overflow-y: auto; padding: 5px; }
 
@@ -163,62 +147,49 @@
             align-items: center;
             padding: 12px;
             margin-bottom: 2px;
-            background: var(--card-bg);
+            background: rgba(255,255,255,0.03);
             cursor: pointer;
             border-left: 3px solid transparent;
             transition: 0.2s;
         }
         .ch-item:hover { background: rgba(59, 130, 246, 0.1); }
-        .ch-item.active {
-            background: rgba(59, 130, 246, 0.15);
-            border-left-color: var(--primary);
-        }
-
+        .ch-item.active { background: rgba(59, 130, 246, 0.15); border-left-color: var(--primary); }
+        
         .ch-icon {
-            width: 36px; height: 36px;
+            width: 32px; height: 32px;
             background: #1e293b;
             display: flex; justify-content: center; align-items: center;
             border-radius: 4px;
-            margin-right: 12px;
-            font-size: 18px; color: var(--primary);
-            border: 1px solid #334155;
+            margin-right: 10px;
+            color: var(--primary);
+            flex-shrink: 0;
         }
-        .ch-name { font-size: 0.95rem; font-weight: 500; color: #e2e8f0; }
-        .ch-tag { font-size: 0.7rem; color: var(--primary); margin-left: auto; font-weight: 700; letter-spacing: 0.5px; }
+        .ch-name { font-size: 0.9rem; font-weight: 500; color: #fff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
         /* FOOTER */
         footer {
             height: 30px;
-            background: #020617;
+            background: #000;
             border-top: 1px solid var(--border);
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 0.7rem;
-            color: var(--text-dim);
+            color: var(--text-sec);
             text-transform: uppercase;
-            letter-spacing: 1px;
         }
 
-        /* LOADING */
+        /* LOADING & ERROR */
         .loading-overlay {
-            position: absolute;
-            inset: 0;
-            background: rgba(0,0,0,0.85);
-            display: none;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 20;
+            position: absolute; inset: 0; background: rgba(0,0,0,0.8);
+            display: none; justify-content: center; align-items: center; z-index: 20; flex-direction: column;
         }
-        .spinner {
-            width: 50px; height: 50px;
-            border: 4px solid rgba(59, 130, 246, 0.2);
-            border-top: 4px solid var(--primary);
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-        }
+        .spin { width: 40px; height: 40px; border: 3px solid #333; border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { 100% { transform: rotate(360deg); } }
+        
+        .fetch-status {
+            text-align: center; padding: 20px; color: var(--text-sec); font-size: 0.85rem;
+        }
 
         /* RESPONSIVE */
         @media (max-width: 768px) {
@@ -232,37 +203,33 @@
 
     <header>
         <div class="logo"><i class="ph-fill ph-monitor-play"></i> MEGA <span>AKSES</span></div>
-        <div class="badge">TOTAL: 50+ CHANNELS</div>
+        <div class="source-badge">SOURCE: idwork.m3u</div>
     </header>
 
     <div class="container">
         <!-- PLAYER -->
         <div class="player-wrap">
-            <div class="video-frame">
-                <video id="video" controls autoplay></video>
-                <div id="loader" class="loading-overlay">
-                    <div class="spinner"></div>
-                    <p style="margin-top:15px; color:#fff; font-family:'Rajdhani'; font-weight:600;">CONNECTING...</p>
-                </div>
+            <video id="video" controls autoplay></video>
+            <div id="loader" class="loading-overlay">
+                <div class="spin"></div>
+                <p style="margin-top:10px; color:#fff;">CONNECTING...</p>
             </div>
             <div class="player-info">
-                <h2 id="chTitle">SELECT CHANNEL</h2>
-                <p id="chStatus"><span class="status-dot dot-online"></span> READY</p>
+                <h2 id="chTitle">LOADING...</h2>
+                <p id="chStatus"><span class="status-dot"></span> FETCHING PLAYLIST</p>
             </div>
         </div>
 
         <!-- SIDEBAR -->
         <div class="sidebar">
-            <div class="tabs">
-                <button class="tab-btn active" onclick="setCat('indo')">INDONESIA</button>
-                <button class="tab-btn" onclick="setCat('news')">NEWS</button>
-                <button class="tab-btn" onclick="setCat('other')">WORLD / ENT</button>
+            <div class="sidebar-header">
+                <div class="search-box">
+                    <i class="ph ph-magnifying-glass"></i>
+                    <input type="text" id="searchInput" placeholder="Cari Channel..." onkeyup="renderList()">
+                </div>
             </div>
-            <div class="search-area">
-                <input type="text" id="searchInp" class="search-input" placeholder="Cari Channel..." onkeyup="renderList()">
-            </div>
-            <div id="listBox" class="list-area">
-                <!-- JS Generated -->
+            <div id="listArea" class="list-area">
+                <div class="fetch-status">Mengambil data dari idwork.m3u...</div>
             </div>
         </div>
     </div>
@@ -272,120 +239,119 @@
     </footer>
 
     <script>
-        // --- DATABASE CHANNEL HARDCODED (ANTI KOSONG) ---
-        // Diambil dari sumber publik paling stabil
+        // --- KONFIGURASI GRAB IDWORK.M3U ---
+        const TARGET_URL = 'https://mgi24.github.io/tvdigital/idwork.m3u';
         
-        const DB = [
-            // === INDONESIA ===
-            { id: 1, cat: 'indo', name: 'TVRI Nasional', url: 'https://v2.siar.us/kaskus/tvri.m3u8' },
-            { id: 2, cat: 'indo', name: 'TVRI Jawa Barat', url: 'https://v2.siar.us/kaskus/tvrijabar.m3u8' },
-            { id: 3, cat: 'indo', name: 'TVRI Jawa Tengah', url: 'https://v2.siar.us/kaskus/tvrijateng.m3u8' },
-            { id: 4, cat: 'indo', name: 'TVRI Jawa Timur', url: 'https://v2.siar.us/kaskus/tvrijatim.m3u8' },
-            { id: 5, cat: 'indo', name: 'JTV Surabaya', url: 'https://v2.siar.us/kaskus/jtv.m3u8' },
-            { id: 6, cat: 'indo', name: 'JOGJA TV', url: 'https://v2.siar.us/kaskus/jogjatv.m3u8' },
-            { id: 7, cat: 'indo', name: 'Bali TV', url: 'https://v2.siar.us/kaskus/balitv.m3u8' },
-            { id: 8, cat: 'indo', name: 'Batam TV', url: 'https://v2.siar.us/kaskus/batamtv.m3u8' },
-            { id: 9, cat: 'indo', name: 'Rodja TV', url: 'https://v2.siar.us/kaskus/rodjatv.m3u8' },
-            { id: 10, cat: 'indo', name: 'Spacetoon Indonesia', url: 'https://v2.siar.us/kaskus/spacetoon.m3u8' },
-            { id: 11, cat: 'indo', name: 'DAAI TV', url: 'https://v2.siar.us/kaskus/daaitv.m3u8' },
-            { id: 12, cat: 'indo', name: 'MQTV (Mekkah)', url: 'https://v2.siar.us/kaskus/mqtv.m3u8' },
-            { id: 13, cat: 'indo', name: 'NET TV (Backup)', url: 'https://v2.siar.us/kaskus/nettv.m3u8' },
-            { id: 14, cat: 'indo', name: 'ANTV (Backup)', url: 'https://v2.siar.us/kaskus/antv.m3u8' },
-
-            // === NEWS (LIVE & STABLE) ===
-            { id: 101, cat: 'news', name: 'Metro TV', url: 'https://v2.siar.us/kaskus/metrotv.m3u8' },
-            { id: 102, cat: 'news', name: 'TVOne', url: 'https://v2.siar.us/kaskus/tvone.m3u8' },
-            { id: 103, cat: 'news', name: 'Kompas TV', url: 'https://v2.siar.us/kaskus/kompastv.m3u8' },
-            { id: 104, cat: 'news', name: 'Berita Satu', url: 'https://v2.siar.us/kaskus/beritasatu.m3u8' },
-            { id: 105, cat: 'news', name: 'CNN International', url: 'https://cnn-cnninternational-1-eu.rakuten.wurl.tv/playlist.m3u8' },
-            { id: 106, cat: 'news', name: 'BBC World News', url: 'https://bbcwspanual.akamaized.net/hls/live/2019845/bbc_world/playlist.m3u8' },
-            { id: 107, cat: 'news', name: 'Al Jazeera English', url: 'https://live-hls-web-aje.getaj.net/AJE/03.m3u8' },
-            { id: 108, cat: 'news', name: 'DW English', url: 'https://dwamdstream102.akamaized.net/hls/live/2015525/dwstream102/index.m3u8' },
-            { id: 109, cat: 'news', name: 'France 24 English', url: 'https://cdn.klowdtv.net/803B48A/n1.klowdtv.net/live1/france24_720p/playlist.m3u8' },
-            { id: 110, cat: 'news', name: 'TRT World', url: 'https://tv-trtworld.live.trt.com.tr/master.m3u8' },
-            { id: 111, cat: 'news', name: 'CNA (Singapore)', url: 'https://d2e1asnsl7br7b.cloudfront.net/7782e205e72f43aeb4a48ec97f66ebbe/index_5.m3u8' },
-            { id: 112, cat: 'news', name: 'NHK World Japan', url: 'https://nhkwlive-ojp.akamaized.net/hls/live/2003459/nhkwlive-ojp-en/index.m3u8' },
-
-            // === WORLD / ENTERTAINMENT / EDUCATION ===
-            { id: 201, cat: 'other', name: 'NASA TV Public', url: 'https://ntv1.akamaized.net/hls/live/2014075/NASA-TV-1/master.m3u8' },
-            { id: 202, cat: 'other', name: 'Red Bull TV', url: 'https://rbmn-live.akamaized.net/hls/live/590964/BoRB-AT/master.m3u8' },
-            { id: 203, cat: 'other', name: 'Fashion TV', url: 'https://fash1043.cloudycdn.services/slive/_definst_/ftv_mid_dl/chunklist_w1086229041.m3u8' },
-            { id: 204, cat: 'other', name: 'Euronews English', url: 'https://euronews-euronews-world-2-eu.rakuten.wurl.tv/playlist.m3u8' },
-            { id: 205, cat: 'other', name: 'RT Documentary', url: 'https://rt-rtd.rttv.com/dvr/rtdoc/playlist_4500Kb.m3u8' },
-            { id: 206, cat: 'other', name: 'Pluto TV Movies', url: 'https://service-stitcher.clusters.pluto.tv/stitch/hls/channel/5cb0cae7a461406ffe3f5213/master.m3u8' },
-            { id: 207, cat: 'other', name: 'Pluto TV Action', url: 'https://service-stitcher.clusters.pluto.tv/stitch/hls/channel/5cb0cae9a461406ffe3f5216/master.m3u8' },
-            { id: 208, cat: 'other', name: 'Pluto TV Comedy', url: 'https://service-stitcher.clusters.pluto.tv/stitch/hls/channel/5cb0ceb3723b33c236482f6c/master.m3u8' },
-            { id: 209, cat: 'other', name: 'Pluto TV Retro', url: 'https://service-stitcher.clusters.pluto.tv/stitch/hls/channel/5c957466a461406ffe3f5a72/master.m3u8' },
-            { id: 210, cat: 'other', name: 'Test Stream (Big Buck)', url: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8' }
-        ];
-
-        // === LOGIC PLAYER ===
-        let currentCat = 'indo';
+        let channels = [];
         let hls = null;
         const video = document.getElementById('video');
-        const listBox = document.getElementById('listBox');
-        const searchInp = document.getElementById('searchInp');
+        const listArea = document.getElementById('listArea');
         const loader = document.getElementById('loader');
+        const searchInput = document.getElementById('searchInput');
         const chTitle = document.getElementById('chTitle');
         const chStatus = document.getElementById('chStatus');
 
-        // Init
-        window.onload = () => {
-            renderList();
-            playChannel(DB[0].url);
-        };
+        // --- INISIALISASI ---
+        window.addEventListener('DOMContentLoaded', () => {
+            fetchPlaylist();
+        });
 
-        // Switch Category
-        function setCat(cat) {
-            currentCat = cat;
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-            renderList();
+        // 1. FETCH DATA DARI LINK USER
+        async function fetchPlaylist() {
+            try {
+                chStatus.innerHTML = '<span class="status-dot" style="background:var(--warning)"></span> CONNECTING TO SOURCE...';
+                const response = await fetch(TARGET_URL);
+                
+                if (!response.ok) throw new Error("Gagal mengambil data");
+                
+                const text = await response.text();
+                parseM3U(text);
+                chStatus.innerHTML = '<span class="status-dot dot-online"></span> READY';
+            } catch (error) {
+                console.error(error);
+                listArea.innerHTML = '<div class="fetch-status" style="color:var(--danger)">Gagal mengambil idwork.m3u.<br>Cek koneksi internet atau link mati.</div>';
+                chStatus.innerHTML = '<span class="status-dot dot-offline"></span> ERROR FETCH';
+            }
         }
 
-        // Render List
-        function renderList() {
-            const query = searchInp.value.toLowerCase();
-            listBox.innerHTML = '';
+        // 2. PARSER M3U
+        function parseM3U(content) {
+            const lines = content.split('\n');
+            channels = [];
+            let temp = {};
 
-            const filtered = DB.filter(ch => ch.cat === currentCat && ch.name.toLowerCase().includes(query));
+            lines.forEach(line => {
+                line = line.trim();
+                if (!line) return;
+
+                if (line.startsWith('#EXTINF:')) {
+                    // Ambil Nama Channel
+                    const info = line.split(',');
+                    const name = info.length > 1 ? info[info.length - 1].trim() : "Unknown Channel";
+                    // Ambil Group Title (opsional)
+                    const groupMatch = line.match(/group-title="([^"]*)"/);
+                    const group = groupMatch ? groupMatch[1] : "General";
+                    
+                    temp = { name, group, url: '' };
+                } else if (!line.startsWith('#')) {
+                    if (temp.name) {
+                        temp.url = line;
+                        channels.push(temp);
+                        temp = {};
+                    }
+                }
+            });
+
+            if (channels.length > 0) {
+                renderList();
+                playChannel(channels[0].url); // Play channel pertama
+            } else {
+                listArea.innerHTML = '<div class="fetch-status">Playlist kosong atau format salah.</div>';
+            }
+        }
+
+        // 3. RENDER LIST
+        function renderList() {
+            const query = searchInput.value.toLowerCase();
+            listArea.innerHTML = '';
+
+            const filtered = channels.filter(ch => ch.name.toLowerCase().includes(query));
 
             if (filtered.length === 0) {
-                listBox.innerHTML = '<div style="padding:20px; text-align:center; color:#64748b;">Tidak ada channel</div>';
+                listArea.innerHTML = '<div class="fetch-status">Tidak ditemukan.</div>';
                 return;
             }
 
             filtered.forEach(ch => {
+                const isActive = video.src && video.src.includes(ch.url);
                 const div = document.createElement('div');
-                div.className = `ch-item ${video.src && video.src.includes(ch.url) ? 'active' : ''}`;
+                div.className = `ch-item ${isActive ? 'active' : ''}`;
                 div.onclick = () => playChannel(ch.url);
-                
+
                 div.innerHTML = `
                     <div class="ch-icon"><i class="ph ph-television"></i></div>
                     <div class="ch-name">${ch.name}</div>
-                    <div class="ch-tag">LIVE</div>
                 `;
-                listBox.appendChild(div);
+                listArea.appendChild(div);
             });
         }
 
-        // Play Channel
+        // 4. PLAY LOGIC (DENGAN ERROR HANDLING)
         function playChannel(url) {
-            const ch = DB.find(c => c.url === url);
+            const ch = channels.find(c => c.url === url);
             if(!ch) return;
 
             chTitle.textContent = ch.name;
-            chStatus.innerHTML = '<span class="status-dot" style="background:orange"></span> BUFFERING...';
+            chStatus.innerHTML = '<span class="status-dot" style="background:var(--warning)"></span> BUFFERING...';
             loader.style.display = 'flex';
-            renderList(); // Refresh active state
+            renderList();
 
             if (Hls.isSupported()) {
-                if (hls) { hls.destroy(); }
+                if (hls) hls.destroy();
                 hls = new Hls({
                     debug: false,
                     enableWorker: true,
-                    lowLatencyMode: true,
-                    backBufferLength: 90
+                    lowLatencyMode: true
                 });
                 hls.loadSource(url);
                 hls.attachMedia(video);
@@ -399,8 +365,9 @@
                 hls.on(Hls.Events.ERROR, (event, data) => {
                     if (data.fatal) {
                         loader.style.display = 'none';
-                        chStatus.innerHTML = '<span class="status-dot dot-offline"></span> OFFLINE / ERROR';
-                        // Auto Recover Strategy
+                        chStatus.innerHTML = '<span class="status-dot dot-offline"></span> STREAM OFFLINE / BLOCKED';
+                        
+                        // Recovery Strategy
                         switch (data.type) {
                             case Hls.ErrorTypes.NETWORK_ERROR:
                                 hls.startLoad();
